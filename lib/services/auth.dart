@@ -7,7 +7,7 @@ class User {
   User({@required this.uid});
 }
 
-abstract class AutBase {
+abstract class AuthBase {
   Future<User> currentUser();
 
   Future<User> signInAnonymous();
@@ -15,7 +15,7 @@ abstract class AutBase {
   Future<void> signOut();
 }
 
-class Auth implements AutBase {
+class Auth implements AuthBase {
   final _firebaseAuth = FirebaseAuth.instance;
 
   User _userFromFirebase(FirebaseUser user) {
