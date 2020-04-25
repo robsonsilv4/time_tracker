@@ -10,7 +10,7 @@ class User {
 abstract class AuthBase {
   Future<User> currentUser();
 
-  Future<User> signInAnonymous();
+  Future<User> signInAnonymously();
 
   Future<void> signOut();
 }
@@ -32,7 +32,7 @@ class Auth implements AuthBase {
   }
 
   @override
-  Future<User> signInAnonymous() async {
+  Future<User> signInAnonymously() async {
     final authResult = await _firebaseAuth.signInAnonymously();
     return _userFromFirebase(authResult.user);
   }
