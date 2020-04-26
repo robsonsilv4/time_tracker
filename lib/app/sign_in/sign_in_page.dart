@@ -5,18 +5,13 @@ import 'sign_in_button.dart';
 import 'social_sign_in_button.dart';
 
 class SignInPage extends StatelessWidget {
-  final Function(User) onSignIn;
   final AuthBase auth;
 
-  SignInPage({
-    @required this.auth,
-    @required this.onSignIn,
-  });
+  SignInPage({@required this.auth});
 
   Future<void> _signInAnonymous() async {
     try {
-      final user = await auth.signInAnonymously();
-      onSignIn(user);
+      await auth.signInAnonymously();
     } catch (error) {
       print(error.toString());
     }
