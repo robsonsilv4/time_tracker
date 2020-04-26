@@ -17,6 +17,8 @@ class EmailSignInForm extends StatefulWidget {
 class _EmailSignInFormState extends State<EmailSignInForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
 
   EmailSignInFormType _formType = EmailSignInFormType.signIn;
 
@@ -55,21 +57,9 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         : 'Have an account? Sign in';
 
     return [
-      TextField(
-        decoration: InputDecoration(
-          labelText: 'Email',
-          hintText: 'test@email.cpm',
-        ),
-        controller: _emailController,
-      ),
+      _buildEmailTextField(),
       SizedBox(height: 8.0),
-      TextField(
-        decoration: InputDecoration(
-          labelText: 'Password',
-        ),
-        obscureText: true,
-        controller: _passwordController,
-      ),
+      _buildPasswordTextField(),
       SizedBox(height: 8.0),
       FormSubmitButton(
         text: primaryText,
@@ -83,6 +73,34 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
     ];
   }
 
+  TextField _buildEmailTextField() {
+    return TextField(
+      focusNode: _emailFocusNode,
+      decoration: InputDecoration(
+        labelText: 'Email',
+        hintText: 'test@email.cpm',
+      ),
+      autocorrect: false,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.next,
+      controller: _emailController,
+      onEditingComplete: _emailEditingComplete,
+    );
+  }
+
+  TextField _buildPasswordTextField() {
+    return TextField(
+      focusNode: _passwordFocusNode,
+      decoration: InputDecoration(
+        labelText: 'Password',
+      ),
+      obscureText: true,
+      textInputAction: TextInputAction.done,
+      controller: _passwordController,
+      onEditingComplete: _submit,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -93,5 +111,9 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         children: _buildChildren(),
       ),
     );
+  }
+
+  void _emailEditingComplete() {
+    FocusScope.of(context).requestFocus(_passwordFocusNode);
   }
 }
