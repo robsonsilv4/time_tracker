@@ -78,6 +78,8 @@ class Auth implements AuthBase {
 
   @override
   Future<void> signOut() async {
+    final googleSingIn = GoogleSignIn();
+    await googleSingIn.signOut();
     await _firebaseAuth.signOut();
   }
 }
