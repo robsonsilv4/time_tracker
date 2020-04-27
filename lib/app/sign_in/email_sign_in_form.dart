@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:time_tracker/common_widgets/platform_alert_dialog.dart';
 
 import '../../common_widgets/form_submit_button.dart';
 import '../../services/auth.dart';
@@ -43,27 +44,11 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       }
       Navigator.of(context).pop();
     } catch (error) {
-      if (Platform.isIOS) {
-        print('Show CupertinoAlertDialog');
-      } else {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Sign in failed'),
-              content: Text(
-                error.toString(),
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('OK'),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            );
-          },
-        );
-      }
+      PlatformAlertDialog(
+        title: 'Sign in failed',
+        content: error.toString(),
+        defaultActionText: 'OK',
+      ).show(context);
     } finally {
       setState(() {
         _isLoading = false;
