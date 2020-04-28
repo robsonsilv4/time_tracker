@@ -9,7 +9,15 @@ class PlatformExceptionAlertDialog extends PlatformAlertDialog {
     @required PlatformException exception,
   }) : super(
           title: title,
-          content: exception.message,
+          content: _message(exception),
           defaultActionText: 'Ok',
         );
+
+  static String _message(PlatformException exception) {
+    return _errors[exception.code] ?? exception.message;
+  }
+
+  static Map<String, String> _errors = {
+    'ERROR_WRONG_PASSWORD': 'The password is invalid',
+  };
 }
