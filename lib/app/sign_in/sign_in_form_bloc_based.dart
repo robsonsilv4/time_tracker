@@ -7,10 +7,8 @@ import '../../common_widgets/platform_exception_alert_dialog.dart';
 import '../../services/auth.dart';
 import 'email_sign_in_bloc.dart';
 import 'email_sign_in_model.dart';
-import 'validators.dart';
 
-class EmailSignInFormBlocBased extends StatefulWidget
-    with EmailAndPasswordValidators {
+class EmailSignInFormBlocBased extends StatefulWidget {
   final EmailSigInBloc bloc;
 
   EmailSignInFormBlocBased({Key key, this.bloc}) : super(key: key);
@@ -51,87 +49,60 @@ class _EmailSignInFormBlocBasedState extends State<EmailSignInFormBlocBased> {
     }
   }
 
-  void _toggleFormType(EmailSignInModel model) {
-    widget.bloc.updateWith(
-      email: '',
-      password: '',
-      formType: model.formType == EmailSignInFormType.signIn
-          ? EmailSignInFormType.register
-          : EmailSignInFormType.signIn,
-      isLoading: false,
-      submitted: false,
-    );
+  void _toggleFormType() {
+    widget.bloc.toggleFormType();
     _emailController.clear();
     _passwordController.clear();
   }
 
   List<Widget> _buildChildren(EmailSignInModel model) {
-    final primaryText = model.formType == EmailSignInFormType.signIn
-        ? 'Sign in'
-        : 'Create an account';
-    final secondaryText = model.formType == EmailSignInFormType.signIn
-        ? 'Need an account? Register'
-        : 'Have an account? Sign in';
-
-    bool submitEnabled = widget.emailValidator.isValid(model.email) &&
-        widget.passwordValidator.isValid(model.password) &&
-        !model.isLoading;
-
     return [
       _buildEmailTextField(model),
       SizedBox(height: 8.0),
       _buildPasswordTextField(model),
       SizedBox(height: 8.0),
       FormSubmitButton(
-        text: primaryText,
-        onPressed: submitEnabled ? _submit : null,
+        text: model.primaryButtonText,
+        onPressed: model.canSubmit ? _submit : null,
       ),
       SizedBox(height: 8.0),
       FlatButton(
-        child: Text(secondaryText),
-        onPressed: !model.isLoading ? () => _toggleFormType(model) : null,
+        child: Text(model.secondaryButtonText),
+        onPressed: !model.isLoading ? _toggleFormType : null,
       ),
     ];
   }
 
   TextField _buildEmailTextField(EmailSignInModel model) {
-    bool showErrorText =
-        model.submitted && !widget.emailValidator.isValid(model.email);
     return TextField(
       focusNode: _emailFocusNode,
       decoration: InputDecoration(
         enabled: model.isLoading == false,
         labelText: 'Email',
         hintText: 'test@email.cpm',
-        errorText: showErrorText ? widget.invalidEmailErrorText : null,
+        errorText: model.emailErrorText,
       ),
       autocorrect: false,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       controller: _emailController,
-      onChanged: (email) => widget.bloc.updateWith(
-        email: email,
-      ),
+      onChanged: widget.bloc.updateEmail,
       onEditingComplete: () => _emailEditingComplete(model),
     );
   }
 
   TextField _buildPasswordTextField(EmailSignInModel model) {
-    bool showErrorText =
-        model.submitted && !widget.passwordValidator.isValid(model.password);
     return TextField(
       focusNode: _passwordFocusNode,
       decoration: InputDecoration(
         enabled: model.isLoading == false,
         labelText: 'Password',
-        errorText: showErrorText ? widget.invalidEmailErrorText : null,
+        errorText: model.passwordErrorText,
       ),
       obscureText: true,
       textInputAction: TextInputAction.done,
       controller: _passwordController,
-      onChanged: (password) => widget.bloc.updateWith(
-        password: password,
-      ),
+      onChanged: widget.bloc.updatePassword,
       onEditingComplete: _submit,
     );
   }
@@ -165,7 +136,7 @@ class _EmailSignInFormBlocBasedState extends State<EmailSignInFormBlocBased> {
   }
 
   void _emailEditingComplete(EmailSignInModel model) {
-    final newFocus = widget.emailValidator.isValid(model.email)
+    final newFocus = model.emailValidator.isValid(model.email)
         ? _passwordFocusNode
         : _emailFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
