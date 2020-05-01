@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../common_widgets/platform_alert_dialog.dart';
 import '../../services/auth.dart';
+import '../../services/database.dart';
+import 'models/job.dart';
 
 class JobsPage extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async {
@@ -44,6 +46,20 @@ class JobsPage extends StatelessWidget {
             onPressed: () => _confirmSignOut(context),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => _createJob(context),
+      ),
+    );
+  }
+
+  Future<void> _createJob(BuildContext context) async {
+    final database = Provider.of<Database>(context, listen: false);
+    await database.createJob(
+      Job(
+        name: 'Blogging',
+        ratePerHour: 10,
       ),
     );
   }
