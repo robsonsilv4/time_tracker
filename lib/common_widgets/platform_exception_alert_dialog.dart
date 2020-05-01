@@ -14,6 +14,12 @@ class PlatformExceptionAlertDialog extends PlatformAlertDialog {
         );
 
   static String _message(PlatformException exception) {
+    if (exception.message ==
+        'description=Missing or insufficient permissions.') {
+      if (exception.code == 'PERMISSION_DENIED') {
+        return 'Missing or insufficient permissions';
+      }
+    }
     return _errors[exception.code] ?? exception.message;
   }
 
