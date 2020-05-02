@@ -41,17 +41,17 @@ class _AddJobPageState extends State<AddJobPage> {
   }
 
   Future<void> _submit() async {
-    try {
-      if (_validateAndSaveForm()) {
+    if (_validateAndSaveForm()) {
+      try {
         final job = Job(name: _name, ratePerHour: _ratePerHour);
         await widget.database.createJob(job);
         Navigator.of(context).pop();
+      } on PlatformException catch (error) {
+        PlatformExceptionAlertDialog(
+          title: 'Operation failed',
+          exception: error,
+        );
       }
-    } on PlatformException catch (error) {
-      PlatformExceptionAlertDialog(
-        title: 'Operation failed',
-        exception: error,
-      );
     }
   }
 
