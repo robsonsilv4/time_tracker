@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:time_tracker/common_widgets/platform_exception_alert_dialog.dart';
 
 import '../../common_widgets/platform_alert_dialog.dart';
+import '../../common_widgets/platform_exception_alert_dialog.dart';
 import '../../services/auth.dart';
 import '../../services/database.dart';
 import 'models/job.dart';
@@ -49,10 +49,35 @@ class JobsPage extends StatelessWidget {
           ),
         ],
       ),
+      body: _buildContents(context),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () => _createJob(context),
       ),
+    );
+  }
+
+  Widget _buildContents(context) {
+    final database = Provider.of<Database>(context, listen: false);
+    return StreamBuilder<List<Job>>(
+      stream: database.jobsStream(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final jobs = snapshot.data;
+          final children = jobs.map((job) => Text(job.name)).toList();
+          return ListView(
+            children: children,
+          );
+        }
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Some error ocurred'),
+          );
+        }
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
     );
   }
 
