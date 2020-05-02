@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:time_tracker/app/home/jobs/job_list_tile.dart';
 
 import '../../../common_widgets/platform_alert_dialog.dart';
 import '../../../services/auth.dart';
@@ -63,7 +64,12 @@ class JobsPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final jobs = snapshot.data;
-          final children = jobs.map((job) => Text(job.name)).toList();
+          final children = jobs
+              .map((job) => JobListTile(
+                    job: job,
+                    onTap: () {},
+                  ))
+              .toList();
           return ListView(
             children: children,
           );
