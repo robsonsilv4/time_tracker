@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import '../../../common_widgets/platform_exception_alert_dialog.dart';
+import '../../../services/database.dart';
+import '../models/job.dart';
 
 class AddJobPage extends StatefulWidget {
+  final Database database;
+
+  const AddJobPage({Key key, this.database}) : super(key: key);
+
   static Future<void> show(BuildContext context) async {
+    final database = Provider.of<Database>(context, listen: false);
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AddJobPage(),
+        builder: (context) => AddJobPage(database: database),
         fullscreenDialog: true,
       ),
     );
@@ -27,6 +38,21 @@ class _AddJobPageState extends State<AddJobPage> {
       return true;
     }
     return false;
+  }
+
+  Future<void> _submit() async {
+    try {
+      if (_validateAndSaveForm()) {
+        final job = Job(name: _name, ratePerHour: _ratePerHour);
+        await widget.database.createJob(job);
+        Navigator.of(context).pop();
+      }
+    } on PlatformException catch (error) {
+      PlatformExceptionAlertDialog(
+        title: 'Operation failed',
+        exception: error,
+      );
+    }
   }
 
   @override
@@ -98,11 +124,5 @@ class _AddJobPageState extends State<AddJobPage> {
         onSaved: (value) => _ratePerHour = int.tryParse(value) ?? 0,
       ),
     ];
-  }
-
-  void _submit() {
-    if (_validateAndSaveForm()) {
-      print('Form saved, name: $_name, ratePerHour: $_ratePerHour');
-    }
   }
 }
