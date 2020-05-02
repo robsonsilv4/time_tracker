@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:time_tracker/common_widgets/platform_alert_dialog.dart';
 
 import '../../../common_widgets/platform_exception_alert_dialog.dart';
 import '../../../services/database.dart';
@@ -43,9 +44,19 @@ class _AddJobPageState extends State<AddJobPage> {
   Future<void> _submit() async {
     if (_validateAndSaveForm()) {
       try {
-        final job = Job(name: _name, ratePerHour: _ratePerHour);
-        await widget.database.createJob(job);
-        Navigator.of(context).pop();
+        final jobs = await widget.database.jobsStream().first;
+        final allNames = jobs.map((job) => job.name).toList();
+        if (allNames.contains(_name)) {
+          PlatformAlertDialog(
+                  title: 'Name already used',
+                  content: 'Please choose a different job name',
+                  defaultActionText: 'Ok')
+              .show(context);
+        } else {
+          final job = Job(name: _name, ratePerHour: _ratePerHour);
+          await widget.database.createJob(job);
+          Navigator.of(context).pop();
+        }
       } on PlatformException catch (error) {
         PlatformExceptionAlertDialog(
           title: 'Operation failed',
