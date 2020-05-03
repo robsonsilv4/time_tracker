@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../../common_widgets/platform_alert_dialog.dart';
+import '../../../common_widgets/platform_exception_alert_dialog.dart';
 import '../../../services/auth.dart';
 import '../../../services/database.dart';
 import '../models/job.dart';
@@ -65,12 +67,30 @@ class JobsPage extends StatelessWidget {
       builder: (context, snapshot) {
         return ListItemsBuilder<Job>(
           snapshot: snapshot,
-          itemBuilder: (context, job) => JobListTile(
-            job: job,
-            onTap: () => EditJobPage.show(context, job: job),
+          itemBuilder: (context, job) => Dismissible(
+            key: Key('job-${job.id}'),
+            background: Container(color: Colors.red),
+            onDismissed: (direction) => _delete(context, job),
+            direction: DismissDirection.endToStart,
+            child: JobListTile(
+              job: job,
+              onTap: () => EditJobPage.show(context, job: job),
+            ),
           ),
         );
       },
     );
+  }
+
+  Future<void> _delete(BuildContext context, Job job) async {
+    try {
+      final database = Provider.of<Database>(context);
+      await database.deleteJob(job);
+    } on PlatformException catch (error) {
+      PlatformExceptionAlertDialog(
+        title: 'Operation failed',
+        exception: error,
+      );
+    }
   }
 }
