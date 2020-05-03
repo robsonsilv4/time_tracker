@@ -6,6 +6,7 @@ import '../../../services/auth.dart';
 import '../../../services/database.dart';
 import '../models/job.dart';
 import 'edit_job_page.dart';
+import 'empty_content.dart';
 import 'job_list_tile.dart';
 
 class JobsPage extends StatelessWidget {
@@ -64,15 +65,18 @@ class JobsPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final jobs = snapshot.data;
-          final children = jobs
-              .map((job) => JobListTile(
-                    job: job,
-                    onTap: () => EditJobPage.show(context, job: job),
-                  ))
-              .toList();
-          return ListView(
-            children: children,
-          );
+          if (jobs.isNotEmpty) {
+            final children = jobs
+                .map((job) => JobListTile(
+                      job: job,
+                      onTap: () => EditJobPage.show(context, job: job),
+                    ))
+                .toList();
+            return ListView(
+              children: children,
+            );
+          }
+          return EmptyContent();
         }
         if (snapshot.hasError) {
           return Center(
