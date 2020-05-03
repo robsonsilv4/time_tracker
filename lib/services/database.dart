@@ -21,13 +21,13 @@ class FirestoreDatabase implements Database {
 
   @override
   Future<void> setJob(Job job) async => await _service.setData(
-        path: ApiPath.job(uid, job.id),
+        path: APIPath.job(uid, job.id),
         data: job.toMap(),
       );
 
   @override
   Stream<List<Job>> jobsStream() => _service.collectionStream(
-        path: ApiPath.jobs(uid),
+        path: APIPath.jobs(uid),
         builder: (data, documentId) => Job.fromMap(data, documentId),
       );
 }
